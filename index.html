@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Birthday Maze Game</title>
+  <style>
+    body {
+      margin: 0;
+      font-family: 'Segoe UI', sans-serif;
+      background: linear-gradient(to right, #ffd6e0, #e0e0ff);
+      overflow-x: hidden;
+    }
+
+    h1 {
+      text-align: center;
+      color: #c94f7c;
+      margin: 20px 10px 10px;
+    }
+
+    #gameWrapper {
+  display: flex;
+  flex-direction: column; /* stack maze and controls vertically */
+  align-items: center;
+  gap: 20px;
+  padding: 20px;
+}
+
+
+    #maze {
+      display: grid;
+      grid-template-columns: repeat(10, 40px);
+      grid-template-rows: repeat(10, 40px);
+      gap: 2px;
+    }
+
+    .cell {
+      width: 40px;
+      height: 40px;
+      background-color: white;
+      border: 1px solid #ccc;
+    }
+
+    .wall {
+      background-color: #6a3d6d;
+    }
+
+    .player {
+      background-color: #ff85a2;
+    }
+
+    .end {
+      background-color: #c6ffe2;
+    }
+
+    #controls {
+      display: grid;
+      grid-template-columns: 60px 60px 60px;
+      grid-template-rows: 60px 60px 60px;
+      gap: 10px;
+      justify-content: center;
+      align-items: center;
+    }
+
+    .btn {
+      width: 60px;
+      height: 60px;
+      font-size: 1.5rem;
+      border: none;
+      border-radius: 10px;
+      background-color: #ff85a2;
+      color: white;
+      cursor: pointer;
+      transition: 0.3s;
+    }
+
+    .btn:hover {
+      background-color: #e4608a;
+    }
+
+    #final-message {
+      display: none;
+      text-align: center;
+      font-size: 1.3rem;
+      color: #6a3d6d;
+      margin-top: 30px;
+      animation: fadeIn 1.5s ease-in-out;
+    }
+
+    .final-images {
+      margin-top: 20px;
+    }
+
+    .final-images img {
+      height: 200px;
+      margin: 10px;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    @media (max-width: 600px) {
+      #gameWrapper {
+        flex-direction: column;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <h1>🎉 Escape the Maze to Get Your Birthday Surprise! 🎂</h1>
+
+  <div id="gameWrapper">
+  <div id="maze"></div>
+  <div id="controls">
+    <div></div>
+    <button class="btn" onclick="move(0, -1)">↑</button>
+    <div></div>
+    <button class="btn" onclick="move(-1, 0)">←</button>
+    <button class="btn" onclick="move(0, 1)">↓</button>
+    <button class="btn" onclick="move(1, 0)">→</button>
+  </div>
+</div>
+
+
+  <div id="final-message">
+    🎊 You did it!<br><br>
+    💖 Dear Majoka,<br>
+    You're the light in every maze, the smile in every moment.<br>
+    Wishing you a birthday as special as your heart! 🎂❤️<br><br>
+    🎁 Happy 17th Birthday!<br><br>
+    <div class="final-images">
+      <img src="./rose.png" alt="Black Rose" />
+      <img src="./baloon.png" alt="Love Balloon" />
+      <img src="./Finger.png" alt="Heart Finger" />
+    </div>
+  </div>
+
+  <script>
+    const mazeData = [
+      [0,1,0,1,0,0,0,0,0,0],
+      [0,1,0,1,1,1,0,1,0,1],
+      [0,0,0,1,0,0,0,1,0,1],
+      [1,1,0,1,0,1,1,1,0,1],
+      [0,0,0,1,0,1,0,0,0,0],
+      [0,1,1,1,0,1,0,1,1,1],
+      [0,1,0,0,0,1,0,0,0,0],
+      [0,1,0,1,1,1,1,1,1,0],
+      [0,0,0,0,0,0,0,0,1,0],
+      [1,1,1,1,1,1,1,0,1,0] // Goal is at (9,9)
+    ];
+
+    const maze = document.getElementById("maze");
+    let playerPos = { x: 0, y: 0 };
+
+    function drawMaze() {
+      maze.innerHTML = "";
+      for (let y = 0; y < 10; y++) {
+        for (let x = 0; x < 10; x++) {
+          const cell = document.createElement("div");
+          cell.classList.add("cell");
+          if (mazeData[y][x] === 1) cell.classList.add("wall");
+          if (x === playerPos.x && y === playerPos.y) cell.classList.add("player");
+          if (x === 9 && y === 9) cell.classList.add("end");
+          maze.appendChild(cell);
+        }
+      }
+    }
+
+    function move(dx, dy) {
+      const newX = playerPos.x + dx;
+      const newY = playerPos.y + dy;
+      if (
+        newX >= 0 && newX < 10 &&
+        newY >= 0 && newY < 10 &&
+        mazeData[newY][newX] === 0
+      ) {
+        playerPos = { x: newX, y: newY };
+        drawMaze();
+        if (newX === 9 && newY === 9) showFinalMessage();
+      }
+    }
+
+    function showFinalMessage() {
+      document.getElementById("gameWrapper").style.display = "none";
+      document.getElementById("final-message").style.display = "block";
+    }
+
+    // Keyboard support
+    document.addEventListener("keydown", e => {
+      switch (e.key) {
+        case "ArrowUp": move(0, -1); break;
+        case "ArrowDown": move(0, 1); break;
+        case "ArrowLeft": move(-1, 0); break;
+        case "ArrowRight": move(1, 0); break;
+      }
+    });
+
+    drawMaze();
+  </script>
+</body>
+</html>
